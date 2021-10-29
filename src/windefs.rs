@@ -1,5 +1,8 @@
+use winapi::shared::guiddef::REFIID;
 use winapi::shared::minwindef::*;
-use winapi::shared::ntdef::{HRESULT, LONG, PCWSTR};
+use winapi::shared::ntdef::{HRESULT, LONG, LPCWSTR, PCWSTR};
+use winapi::um::mmdeviceapi::*;
+use winapi::um::propidl::PROPVARIANT;
 
 // #[link(name = "mf")]
 // #[link(name = "mfplay")]
@@ -15,6 +18,14 @@ extern "system" {
         BasePriority: LONG,
         pdwTaskID: *mut DWORD,
         pID: *mut DWORD,
+    ) -> HRESULT;
+
+    pub fn ActivateAudioInterfaceAsync(
+        deviceInterfacePath: LPCWSTR,
+        riid: REFIID,
+        activationParams: PROPVARIANT,
+        completionHandler: IActivateAudioInterfaceCompletionHandler,
+        activationOperation: IActivateAudioInterfaceAsyncOperation,
     ) -> HRESULT;
 }
 pub const MF_SDK_VERSION: ULONG = 0x0002;
