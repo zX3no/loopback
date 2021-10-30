@@ -1,7 +1,12 @@
 use std::mem::size_of_val;
+use std::ptr::{null, null_mut};
 use std::{mem, ptr};
 use std::{thread, time::Duration};
 use winapi::shared::wtypes::VT_BLOB;
+use winapi::um::audioclient::{IAudioClient, IID_IAudioClient};
+use winapi::um::mmdeviceapi::{
+    IActivateAudioInterfaceAsyncOperation, IActivateAudioInterfaceCompletionHandler,
+};
 use winapi::um::propidl::*;
 
 use crate::windefs::*;
@@ -46,13 +51,18 @@ impl Loopback {
             activate_params.data.blob_mut().cbSize = size_of_val(&audio_params) as u32;
             activate_params.data.blob_mut().pBlobData = audio_params as *mut _;
 
-            // ActivateAudioInterfaceAsync();
-        }
-        //             wil::com_ptr_nothrow<IActivateAudioInterfaceAsyncOperation> asyncOp;
-        //             RETURN_IF_FAILED(ActivateAudioInterfaceAsync(VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK, __uuidof(IAudioClient), &activateParams, this, &asyncOp));
+            let async_op: IActivateAudioInterfaceAsyncOperation = mem::zeroed();
+            let handler: IActivateAudioInterfaceCompletionHandler = mem::zeroed();
 
-        //             // Wait for activation completion
-        //             m_hActivateCompleted.wait();
+            ActivateAudioInterfaceAsync(
+                //TODO: VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK
+                null_mut(),
+                &IID_IAudioClient,
+                activate_params,
+                handler,
+                async_op,
+            );
+        }
     }
     pub fn run(&self, pid: u32, file: &String) {
         self.initialize();
